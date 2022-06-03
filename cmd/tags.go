@@ -87,7 +87,7 @@ to quickly create a Cobra application.`,
 			fmt.Fprintln(os.Stderr, "specified type is not 'major','minor' or 'patch'")
 			os.Exit(-1)
 		}
-		tag := git.GetTags()
+		tag := git.GetLatestTag()
 		splittedTag := strings.Split(tag, ".")
 		majorVerion, minorVersion, patchVersion := splittedTag[0], splittedTag[1], splittedTag[2]
 

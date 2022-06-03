@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func GetTags() string {
@@ -12,7 +13,7 @@ func GetTags() string {
 
 	if err != nil {
 		fmt.Println(err.Error())
-
+		os.Exit(-1)
 	}
 
 	if len(stdout) < 1 {
@@ -20,14 +21,35 @@ func GetTags() string {
 		return (result)
 
 	} else {
-		result := string(stdout)
+		result := strings.TrimRight(string(stdout), "\r\n")
+		return (result)
+
+	}
+
+}
+func GetLatestTag() string {
+	gitCmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
+	stdout, err := gitCmd.Output()
+
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(-1)
+	}
+
+	if len(stdout) < 1 {
+		result := "0.0.0"
+		return (result)
+
+	} else {
+		result := strings.TrimRight(string(stdout), "\r\n")
+		fmt.Println("Latest is" + result)
 		return (result)
 
 	}
 
 }
 func CreateTag(version string) {
-	gitTagCreateCmd := exec.Command("git", "tag  "+version)
+	gitTagCreateCmd := exec.Command("git", "tag", version)
 	stdout, err := gitTagCreateCmd.Output()
 
 	if err != nil {
@@ -37,7 +59,7 @@ func CreateTag(version string) {
 	}
 	fmt.Println(string(stdout))
 
-	gitTagPushCmd := exec.Command("git", "push orign  "+version)
+	gitTagPushCmd := exec.Command("git", "push", "orign", "--tags")
 	gitTagPushCmdOut, gitTagPushCmdErr := gitTagPushCmd.Output()
 
 	if gitTagPushCmdErr != nil {

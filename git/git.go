@@ -42,7 +42,6 @@ func GetLatestTag() string {
 
 	} else {
 		result := strings.TrimRight(string(stdout), "\r\n")
-		fmt.Println("Latest is" + result)
 		return (result)
 
 	}
@@ -60,7 +59,7 @@ func CreateTag(version string) {
 	fmt.Println(string(stdout))
 
 	gitTagPushCmd := exec.Command("git", "push", "orign", "--tags")
-	gitTagPushCmdOut, gitTagPushCmdErr := gitTagPushCmd.Output()
+	gitTagPushCmdOut, gitTagPushCmdErr := gitTagPushCmd.CombinedOutput()
 
 	if gitTagPushCmdErr != nil {
 		fmt.Println("error pushing tag " + version + " " + gitTagPushCmdErr.Error())

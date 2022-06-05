@@ -8,9 +8,9 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"semver-cli/git"
 	"strconv"
-	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -18,20 +18,18 @@ import (
 var Latest bool
 var DryRun bool
 var BumpType string
+var tagPrefix string
 
 // tagsCmd represents the tags command
 var tagsCmd = &cobra.Command{
 	Use:   "tags",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+and usage of using your command. For example:`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 1 {
+		if len(args) < 1 {
 			fmt.Println("Error: must also specify a subcommand")
+
 		}
 
 	},
@@ -43,6 +41,7 @@ func init() {
 
 	tagsBumpCmd.Flags().BoolVarP(&DryRun, "dry-run", "d", false, "Outputs the next determined version without creating it")
 	tagsBumpCmd.Flags().StringVarP(&BumpType, "type", "t", "", "Type of commit, e.g. 'major', 'minor' or 'patch'")
+	tagsBumpCmd.Flags().StringVarP(&tagPrefix, "prefix", "p", "", "The prefix for tagging e.g. 'v'")
 	tagsBumpCmd.MarkFlagRequired("type")
 	tagsCmd.AddCommand(tagsBumpCmd)
 	rootCmd.AddCommand(tagsCmd)
@@ -68,7 +67,11 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(git.GetTags())
+		if Latest {
+			fmt.Println(git.GetLatestTag())
+		} else {
+			fmt.Println(git.GetTags())
+		}
 
 	},
 }
@@ -76,19 +79,17 @@ to quickly create a Cobra application.`,
 var tagsBumpCmd = &cobra.Command{
 	Use:   "bump",
 	Short: "creates the next tag",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long:  `Funcitionality to identify and/or create the next tag in relation to semver conventions`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if BumpType != "major" && BumpType != "minor" && BumpType != "patch" {
 			fmt.Fprintln(os.Stderr, "specified type is not 'major','minor' or 'patch'")
 			os.Exit(-1)
 		}
 		tag := git.GetLatestTag()
-		splittedTag := strings.Split(tag, ".")
+
+		//First 3 numbers found are used as version
+		re := regexp.MustCompile("[0-9]+")
+		splittedTag := re.FindAllString(tag, -1)
 		majorVerion, minorVersion, patchVersion := splittedTag[0], splittedTag[1], splittedTag[2]
 
 		if BumpType == "major" {
@@ -119,7 +120,7 @@ to quickly create a Cobra application.`,
 			patchVersion = strconv.Itoa(currentVersion)
 		}
 
-		var finalVersion string = majorVerion + "." + minorVersion + "." + patchVersion
+		var finalVersion string = tagPrefix + majorVerion + "." + minorVersion + "." + patchVersion
 		if DryRun {
 			fmt.Println(finalVersion)
 		} else {

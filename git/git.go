@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -16,18 +17,14 @@ func GetTags() string {
 		os.Exit(-1)
 	}
 
-	if len(stdout) < 1 {
-		result := "0.0.0"
-		return (result)
-
-	} else {
-		result := strings.TrimRight(string(stdout), "\r\n")
-		return (result)
-
-	}
+	result := strings.TrimRight(string(stdout), "\r\n")
+	return (result)
 
 }
 func GetLatestTag() string {
+	if getAmountOfTags() < 1 {
+		return "0.0.0"
+	}
 	gitCmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
 	stdout, err := gitCmd.Output()
 
@@ -35,17 +32,27 @@ func GetLatestTag() string {
 		fmt.Println(err.Error())
 		os.Exit(-1)
 	}
+	result := strings.TrimRight(string(stdout), "\r\n")
+	return (result)
 
-	if len(stdout) < 1 {
-		result := "0.0.0"
-		return (result)
+}
+func getAmountOfTags() int {
+	gitCmd := exec.Command("git", "rev-list", "--tags", "--count")
+	stdout, err := gitCmd.Output()
 
-	} else {
-		result := strings.TrimRight(string(stdout), "\r\n")
-		return (result)
-
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(-1)
 	}
 
+	result := strings.TrimRight(string(stdout), "\r\n")
+	tagAmout, err := strconv.Atoi(result)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Cannot parse amount of tags")
+		os.Exit(-1)
+	}
+
+	return (tagAmout)
 }
 func CreateTag(version string) {
 	gitTagCreateCmd := exec.Command("git", "tag", version)

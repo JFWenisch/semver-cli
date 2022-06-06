@@ -69,15 +69,14 @@ func CreateTag(version string) {
 
 }
 func GetCurrentBranch() string {
-	gitCmd := exec.Command("git", "rev-parse --abbrev-ref HEAD")
+	gitCmd := exec.Command("git", "branch", "--show-current")
 	stdout, err := gitCmd.Output()
 
 	if err != nil {
 		fmt.Println(err.Error())
 
 	}
-
-	result := string(stdout)
+	result := strings.TrimRight(string(stdout), "\r\n")
 	return (result)
 
 }

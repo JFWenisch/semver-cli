@@ -105,7 +105,7 @@ func generateNextTag(branch string, tag string, bumptype string) string {
 	re := regexp.MustCompile("[0-9]+")
 	splittedTag := re.FindAllString(tag, -1)
 	majorVerion, minorVersion, patchVersion := splittedTag[0], splittedTag[1], splittedTag[2]
-	var finalVersion string
+
 	if branch == releaseBranch {
 
 		if BumpType == "major" {
@@ -135,16 +135,22 @@ func generateNextTag(branch string, tag string, bumptype string) string {
 			currentVersion++
 			patchVersion = strconv.Itoa(currentVersion)
 		}
-		finalVersion = tagPrefix + majorVerion + "." + minorVersion + "." + patchVersion
+		return tagPrefix + majorVerion + "." + minorVersion + "." + patchVersion
 	} else {
-		branchVersion, err := strconv.Atoi(splittedTag[3])
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "cannot parse "+BumpType+" of tag "+tag)
-			os.Exit(-1)
-		}
-		branchVersion++
-		finalVersion = tagPrefix + majorVerion + "." + minorVersion + "." + patchVersion + "-" + branch + "." + strconv.Itoa(branchVersion)
-	}
 
-	return finalVersion
+		if len(splittedTag) > 2 {
+
+			branchVersion, err := strconv.Atoi(splittedTag[3])
+			strconv.Itoa(branchVersion)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "cannot parse "+BumpType+" of tag "+tag)
+				os.Exit(-1)
+			}
+			branchVersion++
+			return tagPrefix + majorVerion + "." + minorVersion + "." + patchVersion + "-" + branch + "." + strconv.Itoa(branchVersion)
+		} else {
+			return tagPrefix + majorVerion + "." + minorVersion + "." + patchVersion + "-" + branch + "." + "1"
+
+		}
+	}
 }

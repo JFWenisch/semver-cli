@@ -76,7 +76,7 @@ func GetCurrentBranch() string {
 		fmt.Println(err.Error())
 
 	}
-	result := string(stdout)
+	result := strings.TrimRight(string(stdout), "\r\n")
 	return (result)
 
 }

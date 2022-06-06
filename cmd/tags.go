@@ -17,6 +17,7 @@ import (
 
 var Latest bool
 var DryRun bool
+var releaseBranch string
 var BumpType string
 var tagPrefix string
 
@@ -40,6 +41,7 @@ func init() {
 	tagsCmd.AddCommand(tagsListCmd)
 
 	tagsBumpCmd.Flags().BoolVarP(&DryRun, "dry-run", "d", false, "Outputs the next determined version without creating it")
+	tagsBumpCmd.Flags().StringVarP(&releaseBranch, "release-branches", "r", "main,master", "Comma seperated list of release branches. When command is executed on a non-release branch, a pre-release version is created'")
 	tagsBumpCmd.Flags().StringVarP(&BumpType, "type", "t", "", "Type of commit, e.g. 'major', 'minor' or 'patch'")
 	tagsBumpCmd.Flags().StringVarP(&tagPrefix, "prefix", "p", "", "The prefix for tagging e.g. 'v'")
 	tagsBumpCmd.MarkFlagRequired("type")
@@ -85,12 +87,26 @@ var tagsBumpCmd = &cobra.Command{
 			fmt.Fprintln(os.Stderr, "specified type is not 'major','minor' or 'patch'")
 			os.Exit(-1)
 		}
-		tag := git.GetLatestTag()
+		var branch string = git.GetCurrentBranch()
+		var tag string = git.GetLatestTag()
 
-		//First 3 numbers found are used as version
-		re := regexp.MustCompile("[0-9]+")
-		splittedTag := re.FindAllString(tag, -1)
-		majorVerion, minorVersion, patchVersion := splittedTag[0], splittedTag[1], splittedTag[2]
+		var nextTag = generateNextTag(branch, tag, BumpType)
+
+		if DryRun {
+			fmt.Println(nextTag)
+		} else {
+			git.CreateTag(nextTag)
+		}
+	},
+}
+
+func generateNextTag(branch string, tag string, bumptype string) string {
+	//First 3 numbers found are used as version
+	re := regexp.MustCompile("[0-9]+")
+	splittedTag := re.FindAllString(tag, -1)
+	majorVerion, minorVersion, patchVersion := splittedTag[0], splittedTag[1], splittedTag[2]
+	var finalVersion string
+	if branch == releaseBranch {
 
 		if BumpType == "major" {
 			currentVersion, err := strconv.Atoi(majorVerion)
@@ -119,12 +135,16 @@ var tagsBumpCmd = &cobra.Command{
 			currentVersion++
 			patchVersion = strconv.Itoa(currentVersion)
 		}
-
-		var finalVersion string = tagPrefix + majorVerion + "." + minorVersion + "." + patchVersion
-		if DryRun {
-			fmt.Println(finalVersion)
-		} else {
-			git.CreateTag(finalVersion)
+		finalVersion = tagPrefix + majorVerion + "." + minorVersion + "." + patchVersion
+	} else {
+		branchVersion, err := strconv.Atoi(splittedTag[3])
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "cannot parse "+BumpType+" of tag "+tag)
+			os.Exit(-1)
 		}
-	},
+		branchVersion++
+		finalVersion = tagPrefix + majorVerion + "." + minorVersion + "." + patchVersion + "-" + branch + "." + strconv.Itoa(branchVersion)
+	}
+
+	return finalVersion
 }

@@ -41,7 +41,7 @@ func init() {
 	tagsCmd.AddCommand(tagsListCmd)
 
 	tagsBumpCmd.Flags().BoolVarP(&DryRun, "dry-run", "d", false, "Outputs the next determined version without creating it")
-	tagsBumpCmd.Flags().StringVarP(&releaseBranch, "release-branches", "r", "main,master", "Comma seperated list of release branches. When command is executed on a non-release branch, a pre-release version is created'")
+	tagsBumpCmd.Flags().StringVarP(&releaseBranch, "release-branches", "r", "main", "Comma seperated list of release branches. When command is executed on a non-release branch, a pre-release version is created'")
 	tagsBumpCmd.Flags().StringVarP(&BumpType, "type", "t", "", "Type of commit, e.g. 'major', 'minor' or 'patch'")
 	tagsBumpCmd.Flags().StringVarP(&tagPrefix, "prefix", "p", "", "The prefix for tagging e.g. 'v'")
 	tagsBumpCmd.MarkFlagRequired("type")

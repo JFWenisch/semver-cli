@@ -81,7 +81,10 @@ to quickly create a Cobra application.`,
 var tagsBumpCmd = &cobra.Command{
 	Use:   "bump",
 	Short: "creates the next tag",
-	Long:  `Funcitionality to identify and/or create the next tag in relation to semver conventions`,
+	Long: `Funcitionality to identify and/or create the next tag in relation to semver conventions. For example:
+
+	semver-cli tags bump -t patch  -p v 
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if BumpType != "major" && BumpType != "minor" && BumpType != "patch" {
 			fmt.Fprintln(os.Stderr, "specified type is not 'major','minor' or 'patch'")

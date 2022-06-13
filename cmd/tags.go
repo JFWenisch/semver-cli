@@ -42,7 +42,7 @@ func init() {
 
 	tagsBumpCmd.Flags().BoolVarP(&DryRun, "dry-run", "d", false, "Outputs the next determined version without creating it")
 	tagsBumpCmd.Flags().StringVarP(&releaseBranch, "release-branches", "r", "main", "Comma seperated list of release branches. When command is executed on a non-release branch, a pre-release version is created'")
-	tagsBumpCmd.Flags().StringVarP(&BumpType, "type", "t", "", "Type of commit, e.g. 'major', 'minor' or 'patch'")
+	tagsBumpCmd.Flags().StringVarP(&BumpType, "type", "t", "", "Type of commit, e.g. 'major', 'minor', 'patch' or 'detect'")
 	tagsBumpCmd.Flags().StringVarP(&tagPrefix, "prefix", "p", "", "The prefix for tagging e.g. 'v'")
 	tagsBumpCmd.MarkFlagRequired("type")
 	tagsCmd.AddCommand(tagsBumpCmd)
@@ -86,12 +86,12 @@ var tagsBumpCmd = &cobra.Command{
 	semver-cli tags bump -t patch  -p v 
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if BumpType != "major" && BumpType != "minor" && BumpType != "patch" {
-			fmt.Fprintln(os.Stderr, "specified type is not 'major','minor' or 'patch'")
+		if BumpType != "major" && BumpType != "minor" && BumpType != "patch" && BumpType != "detect" {
+			fmt.Fprintln(os.Stderr, "specified type is not 'major','minor', 'patch' or 'detect'")
 			os.Exit(-1)
 		}
 		var branch string = git.GetCurrentBranch()
-		var tag string = git.GetLatestTag()
+		var tag string = git.GetLatestTagFromBranch(branch, branch == releaseBranch)
 
 		var nextTag = generateNextTag(branch, tag, BumpType)
 
@@ -104,6 +104,11 @@ var tagsBumpCmd = &cobra.Command{
 }
 
 func generateNextTag(branch string, tag string, bumptype string) string {
+
+	if bumptype == "detect" {
+		bumptype = git.DetectBumpTypeFromTag(tag)
+	}
+
 	//First 3 numbers found are used as version
 	re := regexp.MustCompile("[0-9]+")
 	splittedTag := re.FindAllString(tag, -1)
@@ -111,28 +116,28 @@ func generateNextTag(branch string, tag string, bumptype string) string {
 
 	if branch == releaseBranch {
 
-		if BumpType == "major" {
+		if bumptype == "major" {
 			currentVersion, err := strconv.Atoi(majorVerion)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "cannot parse "+BumpType+" of tag "+tag)
+				fmt.Fprintln(os.Stderr, "cannot parse "+bumptype+" of tag "+tag)
 				os.Exit(-1)
 			}
 			currentVersion++
 			majorVerion = strconv.Itoa(currentVersion)
 		}
-		if BumpType == "minor" {
+		if bumptype == "minor" {
 			currentVersion, err := strconv.Atoi(minorVersion)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "cannot parse "+BumpType+" of tag "+tag)
+				fmt.Fprintln(os.Stderr, "cannot parse "+bumptype+" of tag "+tag)
 				os.Exit(-1)
 			}
 			currentVersion++
 			minorVersion = strconv.Itoa(currentVersion)
 		}
-		if BumpType == "patch" {
+		if bumptype == "patch" {
 			currentVersion, err := strconv.Atoi(patchVersion)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "cannot parse "+BumpType+" of tag "+tag)
+				fmt.Fprintln(os.Stderr, "cannot parse "+bumptype+" of tag "+tag)
 				os.Exit(-1)
 			}
 			currentVersion++
@@ -146,7 +151,7 @@ func generateNextTag(branch string, tag string, bumptype string) string {
 			branchVersion, err := strconv.Atoi(splittedTag[3])
 			strconv.Itoa(branchVersion)
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "cannot parse "+BumpType+" of tag "+tag)
+				fmt.Fprintln(os.Stderr, "cannot parse "+bumptype+" of tag "+tag)
 				os.Exit(-1)
 			}
 			branchVersion++

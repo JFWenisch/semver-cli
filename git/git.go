@@ -97,7 +97,7 @@ func DetectBumpTypeFromTag(tag string) string {
 		return "patch"
 	}
 
-	fmt.Println("No angular style commit detected in last " + string(len(commits)) + " commits. Aborting")
+	//fmt.Println("No angular style commit detected in last " + string(len(commits)) + " commits. Aborting")
 	os.Exit(-1)
 	return "unknown"
 }

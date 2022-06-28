@@ -10,7 +10,7 @@ $ semver-cli tags list --latest
 v11.22.33
 
 # Output the tag on minor changes
-$ semver-cli tags bump --type minor -prefix v --dry-run
+$ semver-cli tags bump --type minor --prefix v --dry-run
 v11.23.0
 ```
 ## Usage

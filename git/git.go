@@ -38,6 +38,7 @@ func GetLatestTag() string {
 }
 func GetLatestTagFromBranch(branch string, releaseBranch bool) string {
 	if getAmountOfTags() < 1 {
+		fmt.Println("Could not find any tags")
 		return "0.0.0"
 	}
 	if releaseBranch {
@@ -58,8 +59,11 @@ func GetLatestTagFromBranch(branch string, releaseBranch bool) string {
 
 }
 func getCommitsSinceTag(tag string) []string {
+	gitCmd := exec.Command("git", "log", "--oneline")
+	if tag != "0.0.0" {
+		gitCmd = exec.Command("git", "log", tag+"..HEAD", "--oneline")
 
-	gitCmd := exec.Command("git", "log", tag+"..HEAD", "--oneline")
+	}
 	stdout, err := gitCmd.Output()
 
 	if err != nil {
@@ -107,6 +111,7 @@ func getAmountOfTags() int {
 
 	if err != nil {
 		fmt.Println(err.Error())
+		fmt.Fprintln(os.Stderr, "Could not list amount of tags")
 		os.Exit(-1)
 	}
 

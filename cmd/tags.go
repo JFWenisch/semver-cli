@@ -92,7 +92,7 @@ var tagsBumpCmd = &cobra.Command{
 		}
 		var branch string = git.GetCurrentBranch()
 		var tag string = git.GetLatestTagFromBranch(branch, branch == releaseBranch)
-
+		fmt.Println("Current tag: " + tag)
 		var nextTag = generateNextTag(branch, tag, BumpType)
 
 		if DryRun {

@@ -4,15 +4,18 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
 	"strconv"
 	"strings"
 )
 
 func GetTags() string {
+	fmt.Println("Running 'git tag'")
 	gitCmd := exec.Command("git", "tag")
 	stdout, err := gitCmd.Output()
 
 	if err != nil {
+		fmt.Println("Exception running 'git tag'")
 		fmt.Println(err.Error())
 		os.Exit(-1)
 	}
@@ -23,6 +26,7 @@ func GetTags() string {
 }
 func GetLatestTag() string {
 	if getAmountOfTags() < 1 {
+		fmt.Println("No tags found. Using '0.0.0'")
 		return "0.0.0"
 	}
 	gitCmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
@@ -42,12 +46,17 @@ func GetLatestTagFromBranch(branch string, releaseBranch bool) string {
 		return "0.0.0"
 	}
 	if releaseBranch {
+		fmt.Println("The supplied branch '" + branch + "' is set as release branch'")
 		return GetLatestTag()
 	}
-	gitCmd := exec.Command("git", "tag", "--sort='creatordate'", "--merged "+branch)
-	stdout, err := gitCmd.Output()
+	fmt.Println("Searching latest tag on '" + branch + "' using 'git describe --match *-%BRANCH%.* --tags --abrev=0'")
+	args := []string{"describe", "--match", "*-develop.*", "--abbrev=0", "--tags"}
+	gitCmd := exec.Command("git", args...)
+	stdout, err := gitCmd.CombinedOutput()
 
 	if err != nil {
+		fmt.Println("Exception getting tags on current branch")
+		fmt.Println(err)
 		var latestTag string = GetLatestTag()
 		//latestTag = latestTag[0:strings.Index(latestTag, "-")]
 		//latestTag = latestTag + "-" + branch + ".0"
@@ -106,6 +115,7 @@ func DetectBumpTypeFromTag(tag string) string {
 	return "unknown"
 }
 func getAmountOfTags() int {
+	fmt.Println("Checking if there are already tags by running 'git rev-list --tags --count'")
 	gitCmd := exec.Command("git", "rev-list", "--tags", "--count")
 	stdout, err := gitCmd.Output()
 
@@ -116,6 +126,7 @@ func getAmountOfTags() int {
 	}
 
 	result := strings.TrimRight(string(stdout), "\r\n")
+	fmt.Println("Found " + result + " existing Tags")
 	tagAmout, err := strconv.Atoi(result)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Cannot parse amount of tags")
@@ -146,14 +157,17 @@ func CreateTag(version string) {
 
 }
 func GetCurrentBranch() string {
+	fmt.Println("Trying to get current branch running 'git branch --show-current'")
 	gitCmd := exec.Command("git", "branch", "--show-current")
 	stdout, err := gitCmd.Output()
 
 	if err != nil {
+		fmt.Println("Exception running 'git branch --show-current'")
 		fmt.Println(err.Error())
 
 	}
 	result := strings.TrimRight(string(stdout), "\r\n")
+	fmt.Println("The current branch is '" + result + "'")
 	return (result)
 
 }

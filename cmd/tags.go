@@ -90,9 +90,10 @@ var tagsBumpCmd = &cobra.Command{
 			fmt.Fprintln(os.Stderr, "specified type is not 'major','minor', 'patch' or 'detect'")
 			os.Exit(-1)
 		}
+
 		var branch string = git.GetCurrentBranch()
 		var tag string = git.GetLatestTagFromBranch(branch, branch == releaseBranch)
-		fmt.Println("Current tag: " + tag)
+		fmt.Println("The latest found tag is '" + tag + "'")
 		var nextTag = generateNextTag(branch, tag, BumpType)
 
 		if DryRun {

@@ -145,11 +145,12 @@ func CreateTag(version string) {
 		os.Exit(-1)
 
 	}
+	fmt.Println("Tag successfully created")
 	fmt.Println(string(stdout))
 	fmt.Println("Trying to push tag running 'git push origin --tags'")
 	gitTagPushCmd := exec.Command("git", "push", "orign", "--tags")
 	gitTagPushCmdOut, gitTagPushCmdErr := gitTagPushCmd.CombinedOutput()
-	fmt.Println(gitTagPushCmdOut)
+	fmt.Println(string(gitTagPushCmdOut))
 	if gitTagPushCmdErr != nil {
 
 		fmt.Println("error pushing tag " + version + " " + gitTagPushCmdErr.Error())

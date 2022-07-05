@@ -136,6 +136,7 @@ func getAmountOfTags() int {
 	return (tagAmout)
 }
 func CreateTag(version string) {
+	fmt.Println("Trying to create a new tag running 'git tag " + version + "'")
 	gitTagCreateCmd := exec.Command("git", "tag", version)
 	stdout, err := gitTagCreateCmd.Output()
 
@@ -145,14 +146,16 @@ func CreateTag(version string) {
 
 	}
 	fmt.Println(string(stdout))
-
+	fmt.Println("Trying to push tag running 'git push origin --tags'")
 	gitTagPushCmd := exec.Command("git", "push", "orign", "--tags")
 	gitTagPushCmdOut, gitTagPushCmdErr := gitTagPushCmd.CombinedOutput()
-
+	fmt.Println(gitTagPushCmdOut)
 	if gitTagPushCmdErr != nil {
+
 		fmt.Println("error pushing tag " + version + " " + gitTagPushCmdErr.Error())
 		os.Exit(-1)
 	}
+	fmt.Println("Successfully created tag'")
 	fmt.Println(string(gitTagPushCmdOut))
 
 }

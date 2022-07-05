@@ -157,8 +157,8 @@ func CreateTag(version string) {
 
 }
 func GetCurrentBranch() string {
-	fmt.Println("Trying to get current branch running 'git branch --show-current'")
-	gitCmd := exec.Command("git", "branch", "--show-current")
+	fmt.Println("Trying to get current branch running 'git rev-parse --abbrev-ref HEAD'")
+	gitCmd := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
 	stdout, err := gitCmd.Output()
 
 	if err != nil {

@@ -1,4 +1,4 @@
-package git
+package cmd
 
 import (
 	"fmt"
@@ -10,7 +10,9 @@ import (
 )
 
 func GetTags() string {
-	fmt.Println("Running 'git tag'")
+	if IsVerbose() {
+		fmt.Println("Running 'git tag'")
+	}
 	gitCmd := exec.Command("git", "tag")
 	stdout, err := gitCmd.Output()
 
@@ -26,7 +28,9 @@ func GetTags() string {
 }
 func GetLatestTag() string {
 	if getAmountOfTags() < 1 {
-		fmt.Println("No tags found. Using '0.0.0'")
+		if IsVerbose() {
+			fmt.Println("No tags found. Using '0.0.0'")
+		}
 		return "0.0.0"
 	}
 	gitCmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
@@ -42,14 +46,20 @@ func GetLatestTag() string {
 }
 func GetLatestTagFromBranch(branch string, releaseBranch bool) string {
 	if getAmountOfTags() < 1 {
-		fmt.Println("Could not find any tags")
+		if IsVerbose() {
+			fmt.Println("Could not find any tags")
+		}
 		return "0.0.0"
 	}
 	if releaseBranch {
-		fmt.Println("The supplied branch '" + branch + "' is set as release branch'")
+		if IsVerbose() {
+			fmt.Println("The supplied branch '" + branch + "' is set as release branch'")
+		}
 		return GetLatestTag()
 	}
-	fmt.Println("Searching latest tag on '" + branch + "' using 'git describe --match *-%BRANCH%.* --tags --abrev=0'")
+	if IsVerbose() {
+		fmt.Println("Searching latest tag on '" + branch + "' using 'git describe --match *-%BRANCH%.* --tags --abrev=0'")
+	}
 	args := []string{"describe", "--match", "*-develop.*", "--abbrev=0", "--tags"}
 	gitCmd := exec.Command("git", args...)
 	stdout, err := gitCmd.CombinedOutput()
@@ -115,7 +125,9 @@ func DetectBumpTypeFromTag(tag string) string {
 	return "unknown"
 }
 func getAmountOfTags() int {
-	fmt.Println("Checking if there are already tags by running 'git rev-list --tags --count'")
+	if IsVerbose() {
+		fmt.Println("Checking if there are already tags by running 'git rev-list --tags --count'")
+	}
 	gitCmd := exec.Command("git", "rev-list", "--tags", "--count")
 	stdout, err := gitCmd.Output()
 
@@ -126,7 +138,9 @@ func getAmountOfTags() int {
 	}
 
 	result := strings.TrimRight(string(stdout), "\r\n")
-	fmt.Println("Found " + result + " existing Tags")
+	if IsVerbose() {
+		fmt.Println("Found " + result + " existing Tags")
+	}
 	tagAmout, err := strconv.Atoi(result)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Cannot parse amount of tags")
@@ -136,7 +150,9 @@ func getAmountOfTags() int {
 	return (tagAmout)
 }
 func CreateTag(version string) {
-	fmt.Println("Trying to create a new tag running 'git tag " + version + "'")
+	if IsVerbose() {
+		fmt.Println("Trying to create a new tag running 'git tag " + version + "'")
+	}
 	gitTagCreateCmd := exec.Command("git", "tag", version)
 	stdout, err := gitTagCreateCmd.Output()
 
@@ -145,9 +161,12 @@ func CreateTag(version string) {
 		os.Exit(-1)
 
 	}
-	fmt.Println("Tag successfully created")
-	fmt.Println(string(stdout))
-	fmt.Println("Trying to push tag running 'git push --tags'")
+	if IsVerbose() {
+		fmt.Println("Tag successfully created")
+		fmt.Println(string(stdout))
+		fmt.Println("Trying to push tag running 'git push --tags'")
+	}
+
 	gitTagPushCmd := exec.Command("git", "push", "--tags")
 	gitTagPushCmdOut, gitTagPushCmdErr := gitTagPushCmd.CombinedOutput()
 	fmt.Println(string(gitTagPushCmdOut))
@@ -156,12 +175,16 @@ func CreateTag(version string) {
 		fmt.Println("error pushing tag " + version + " " + gitTagPushCmdErr.Error())
 		os.Exit(-1)
 	}
-	fmt.Println("Successfully created tag'")
-	fmt.Println(string(gitTagPushCmdOut))
+	if IsVerbose() {
+		fmt.Println("Successfully created tag'")
+		fmt.Println(string(gitTagPushCmdOut))
+	}
 
 }
 func GetCurrentBranch() string {
-	fmt.Println("Trying to get current branch running 'git rev-parse --abbrev-ref HEAD'")
+	if IsVerbose() {
+		fmt.Println("Trying to get current branch running 'git rev-parse --abbrev-ref HEAD'")
+	}
 	gitCmd := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
 	stdout, err := gitCmd.Output()
 
@@ -171,7 +194,9 @@ func GetCurrentBranch() string {
 
 	}
 	result := strings.TrimRight(string(stdout), "\r\n")
-	fmt.Println("The current branch is '" + result + "'")
+	if IsVerbose() {
+		fmt.Println("The current branch is '" + result + "'")
+	}
 	return (result)
 
 }

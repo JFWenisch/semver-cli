@@ -45,6 +45,12 @@ jobs:
             platforms: 'linux/386, linux/amd64, linux/arm ,windows/386, windows/amd64, windows/arm'
             name: 'semver-cli'
             dest: 'dist'
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+          name: dist
+          path: |
+            dist
 
   docker:
 
@@ -100,5 +106,27 @@ jobs:
       with:
         tag: ${{needs.version.outputs.tag}}
         name: Release ${{needs.version.outputs.tag}}
-        artifacts: "dist/semver-cli-*"
+        artifacts: "semver-cli-*"
+        body: ${{needs.version.outputs.changelog}}
+    - name: Download a single artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: dist
+        
+    - name: Display structure of downloaded files
+      run: ls -R
+      
+    - name: Display structure of downloaded files
+      run: ls -R
+     
+    - name: Create a GitHub release
+      uses: ncipollo/release-action@v1
+      if: github.ref == 'refs/heads/develop'
+      
+      with:
+        tag: ${{needs.version.outputs.tag}}
+        name: Release ${{needs.version.outputs.tag}}
+        artifacts: "semver-cli-*"
+        prerelease: true
+        artifactErrorsFailBuild: true
         body: ${{needs.version.outputs.changelog}}

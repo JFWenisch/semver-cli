@@ -1,4 +1,4 @@
-module semver-cli
+module github.com/jfwenisch/semver-cli
 
 go 1.18
 

@@ -100,5 +100,5 @@ jobs:
       with:
         tag: ${{needs.version.outputs.tag}}
         name: Release ${{needs.version.outputs.tag}}
-        artifacts: "dist/semver-cli-linux-386, dist/semver-cli-linux-amd64, dist/semver-cli-linux-arm, dist/semver-cli-windows-386.exe, dist/semver-cli-windows-amd64.exe, dist/semver-cli-windows-arm.exe,"
+        artifacts: "dist/semver-cli-*"
         body: ${{needs.version.outputs.changelog}}

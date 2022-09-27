@@ -1,5 +1,6 @@
 # semver-cli
-[![build](https://github.com/JFWenisch/semver-cli/actions/workflows/build-go.yml/badge.svg?branch=main)](https://github.com/JFWenisch/semver-cli/actions/workflows/build-go.yml)
+[![build](https://github.com/JFWenisch/semver-cli/actions/workflows/build-go.yml/badge.svg?branch=main)](https://github.com/JFWenisch/semver-cli/actions/workflows/build-go.yml) ![Version](https://img.shields.io/github/v/release/jfwenisch/semver-cli) ![License](https://img.shields.io/github/license/jfwenisch/semver-cli)   ![Maintainability](https://img.shields.io/codeclimate/maintainability/JFWenisch/semver-cli)
+ ![Size](https://img.shields.io/github/repo-size/jfwenisch/semver-cli) 
 
 semver-cli is an application that eases the creation of tags and releases during CI. semver cli is written in go using cobra.
 

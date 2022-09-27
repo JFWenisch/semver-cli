@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"semver-cli/git"
+
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -70,9 +70,9 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if Latest {
-			fmt.Println(git.GetLatestTag())
+			fmt.Println(GetLatestTag())
 		} else {
-			fmt.Println(git.GetTags())
+			fmt.Println(GetTags())
 		}
 
 	},
@@ -91,15 +91,17 @@ var tagsBumpCmd = &cobra.Command{
 			os.Exit(-1)
 		}
 
-		var branch string = git.GetCurrentBranch()
-		var tag string = git.GetLatestTagFromBranch(branch, branch == releaseBranch)
-		fmt.Println("The latest found tag is '" + tag + "'")
+		var branch string = GetCurrentBranch()
+		var tag string = GetLatestTagFromBranch(branch, branch == releaseBranch)
+		if IsVerbose() {
+			fmt.Println("The latest found tag is '" + tag + "'")
+		}
 		var nextTag = generateNextTag(branch, tag, BumpType)
 
 		if DryRun {
 			fmt.Println(nextTag)
 		} else {
-			git.CreateTag(nextTag)
+			CreateTag(nextTag)
 		}
 	},
 }
@@ -107,7 +109,7 @@ var tagsBumpCmd = &cobra.Command{
 func generateNextTag(branch string, tag string, bumptype string) string {
 
 	if bumptype == "detect" {
-		bumptype = git.DetectBumpTypeFromTag(tag)
+		bumptype = DetectBumpTypeFromTag(tag)
 	}
 
 	//First 3 numbers found are used as version

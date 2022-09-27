@@ -109,7 +109,7 @@ jobs:
       with:
         tag: ${{needs.version.outputs.tag}}
         name: Release ${{needs.version.outputs.tag}}
-        artifacts: "/github/workspace/dist/semver-cli-*"
+        artifacts: "/github/workspace/dist/*.exe"
         prerelease: true
         artifactErrorsFailBuild: true
         body: ${{needs.version.outputs.changelog}}

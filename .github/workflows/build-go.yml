@@ -1,4 +1,4 @@
-name: Go
+name: Build
 
 on:
   push:
@@ -82,8 +82,8 @@ jobs:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ghcr.io/jfwenisch/flightstatus-frontend:${{needs.version.outputs.tag}}
-            ghcr.io/jfwenisch/flightstatus-frontend:latest
+            ghcr.io/jfwenisch/semver-cli:${{needs.version.outputs.tag}}
+            ghcr.io/jfwenisch/semver-cli:latest
           labels: ${{ steps.meta.outputs.labels }}
 
   release:

@@ -2,9 +2,9 @@ name: Go
 
 on:
   push:
-    branches: [ "main" , "develop"]
+    branches: [ "main" , "develop", "feature/versioning"]
   pull_request:
-    branches: [ "main" , "develop"]
+    branches: [ "main" , "develop", "feature/versioning"]
 
 env:
   # Use docker.io for Docker Hub if empty

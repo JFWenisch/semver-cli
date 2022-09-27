@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ "main" , "develop", "feature/versioning"]
+    branches: [ "main" , "develop", "feature/crosscompile"]
   pull_request:
-    branches: [ "main" , "develop", "feature/versioning"]
+    branches: [ "main" , "develop"]
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -39,10 +39,11 @@ jobs:
       run: go test -v ./...
       
     - name: Build
-      run: |
-        go get -d -v ./...
-        go install -v ./...
-        go build -v ./...
+      uses: thatisuday/go-cross-build@v1
+      with:
+            platforms: 'linux/386, linux/amd64, linux/arm ,windows/386, windows/amd64, windows/arm'
+            name: 'semver-cli'
+            dest: 'dist'
 
   docker:
 
@@ -98,4 +99,5 @@ jobs:
       with:
         tag: ${{needs.version.outputs.tag}}
         name: Release ${{needs.version.outputs.tag}}
+        artifacts: "dist/*"
         body: ${{needs.version.outputs.changelog}}

@@ -102,3 +102,14 @@ jobs:
         name: Release ${{needs.version.outputs.tag}}
         artifacts: "dist/semver-cli-*"
         body: ${{needs.version.outputs.changelog}}
+        
+    - name: Create a GitHub release
+      uses: ncipollo/release-action@v1
+      if: github.ref == 'refs/heads/develop'
+      with:
+        tag: ${{needs.version.outputs.tag}}
+        name: Release ${{needs.version.outputs.tag}}
+        artifacts: "**/semver-cli-*"
+        prerelease: true
+        artifactErrorsFailBuild: true
+        body: ${{needs.version.outputs.changelog}}

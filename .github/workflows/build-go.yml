@@ -47,7 +47,7 @@ jobs:
   docker:
 
     runs-on: ubuntu-latest
-    needs: build
+    needs:  [version, build]
     permissions:
       contents: read
       packages: write

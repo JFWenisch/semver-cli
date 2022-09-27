@@ -106,7 +106,7 @@ jobs:
       with:
         tag: ${{needs.version.outputs.tag}}
         name: Release ${{needs.version.outputs.tag}}
-        artifacts: "dist/semver-cli-*"
+        artifacts: "semver-cli-*"
         body: ${{needs.version.outputs.changelog}}
     - name: Download a single artifact
       uses: actions/download-artifact@v3

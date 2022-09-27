@@ -100,5 +100,5 @@ jobs:
       with:
         tag: ${{needs.version.outputs.tag}}
         name: Release ${{needs.version.outputs.tag}}
-        artifacts: "dist/*"
+        artifacts: "dist/semver-cli-*"
         body: ${{needs.version.outputs.changelog}}
